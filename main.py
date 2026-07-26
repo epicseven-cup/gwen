@@ -76,10 +76,30 @@ def main():
     book.add_metadata("DC", "description", "A mysterious journey into hidden secrets")
     book.add_metadata("DC", "publisher", "Mystic Books Publishing House")
 
-
+    epub_pages = []
     for i in range(len(new_pdf_blocks)):
-        chapter = epub.EpubHtml(title=f"Chapter {i}", file_name=f"Chapter {i}.xhtml", lang="en")
-        content = new_pdf_blocks[i]
+        text_block = new_pdf_blocks[i]
+
+        match text_block.get("type", -1):
+            case 0:
+                # text
+                lines = new_pdf_blocks[i].get("lines")
+
+                content = "".join([span["text"] + "\n" for span in lines.get("spans", [])])
+
+                content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                
+
+
+
+
+
+                pass
+            case 1:
+                # image:
+                pass
+            case _:
+                raise ValueError("Unknow block type")
 
 
 
