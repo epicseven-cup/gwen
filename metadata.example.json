@@ -1,0 +1,11 @@
+{
+  "identifier": "GB33BUKB20201555555555",
+  "title": "The Book of the Mysterious",
+  "language": "en",
+  "authors": [
+    { "name": "John Smith" },
+    { "name": "Hans Müller", "file_as": "Dr. Hans Müller", "role": "ill", "uid": "coauthor" }
+  ],
+  "description": "A mysterious journey into hidden secrets",
+  "publisher": "Mystic Books Publishing House"
+}

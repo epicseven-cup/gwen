@@ -8,6 +8,6 @@
     "adapter": "Debugpy",
     "request": "launch",
     "program": "main.py",
-    "args": ["--input", "input.pdf"]
+    "args": ["--input-path", "input.pdf", "--output-path", "output.epub"]
   }
 ]
