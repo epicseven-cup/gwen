@@ -1,6 +1,7 @@
 import argparse
 import pymupdf
 
+from ebooklib import epub
 
 BAD_BLOCK = (0,0,0,0)
 
@@ -19,6 +20,8 @@ def main():
 
     pdf = pymupdf.open(args.input_path)
 
+    new_pdf_blocks = []
+
 
 
     for p in range(len(pdf)):
@@ -31,57 +34,52 @@ def main():
         blocks = raw_dict.get("blocks", [])
 
         page_blocks = blocks[:]
-
-
+        # Sorting by the y axis
         page_blocks.sort(key=lambda x: x["bbox"][1])
 
-        page_width = page.rect.width
-        for b in blocks:
-            t = b.get("type", -1)
 
+        new_page_blocks = []
+        right_blocks = []
+
+        page_width = page.rect.width
+        for b in page_blocks:
             x0, y0, x1, y1 = b.get("bbox", BAD_BLOCK)
             if (x0, y0, x1, y1) == BAD_BLOCK:
                 raise ValueError("BAD BLOCK")
-
-
-            if (x1 - x0) > page_width * 0.7:
+            if x0 > page_width * 0.7:
                 # Single column
-                middle_page_block.append(b)
-            elif (x1 - x0) > page_width * 0.5:
-                right_page_block.append(b)
+                new_page_blocks.append(b)
+            elif x0 > page_width * 0.5:
+                right_blocks.append(b)
             else:
-                left_page_block.append(b)
+                new_page_blocks.append(b)
+
+        new_page_blocks.extend(right_blocks)
+        new_pdf_blocks.append(new_page_blocks)
 
 
-        left_page_block.sort(key=lambda xb: xb["bbox"][1])
-        right_page_block.sort(key=lambda xb: xb["bbox"][1])
+    book = epub.EpubBook()
+
+    # Set metadata
+    book.set_identifier("GB33BUKB20201555555555")
+    book.set_title("The Book of the Mysterious")
+    book.set_language("en")
+
+    book.add_author("John Smith")
+    book.add_author(
+        "Hans Müller",
+        file_as="Dr. Hans Müller",
+        role="ill",
+        uid="coauthor",
+    )
+
+    book.add_metadata("DC", "description", "A mysterious journey into hidden secrets")
+    book.add_metadata("DC", "publisher", "Mystic Books Publishing House")
 
 
-
-
-
-
-
-
-            match t:
-                case 0:
-                    pass
-                case 1:
-                    pass
-                case _:
-                    print("unknow block type passing")
-                    continue
-            pass
-
-
-
-
-
-
-
-
-
-
+    for i in range(len(new_pdf_blocks)):
+        chapter = epub.EpubHtml(title=f"Chapter {i}", file_name=f"Chapter {i}.xhtml", lang="en")
+        content = new_pdf_blocks[i]
 
 
 
